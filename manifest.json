@@ -2,21 +2,31 @@
     "name": "Harbor Freight Coupons",
     "short_name": "harbor freight coupon database extension",
     "version": "1.4.0",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "description": "Automatically find and display harbor freight coupons on their website from hfqpdb.com",
     "icons": {
+        "16": "icons/icon32.png",
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
     },
-    "browser_action": {
-        "default_icon": "icons/icon32.png"
+    "action": {
+        "default_icon": {
+            "16": "icons/icon32.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        },
+        "default_title": "Harbor Freight Coupons"
     },
     "permissions": [
-        "https://www.hfqpdb.com/price_check/*"
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://www.hfqpdb.com/*",
+        "https://www.harborfreight.com/*",
+        "https://shop.harborfreight.com/*"
     ],
     "background": {
-        "scripts": ["background.js"],
-        "persistent": false
+        "service_worker": "background.js"
     },
     "content_scripts": [{
         "matches": [
@@ -28,5 +38,8 @@
             "coupons.js"
         ],
         "run_at": "document_idle"
-    }]
+    }],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    }
 }

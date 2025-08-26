@@ -1,9 +1,9 @@
 function handleSingleItemPage(priceboxdiv) {
-    var itemno = findSingleItemNo();
+    const itemno = findSingleItemNo();
 
-    var saleCSS = false;
+    let saleCSS = false;
     if (priceboxdiv) {
-        var salebox = priceboxdiv.querySelector('.sale');
+        const salebox = priceboxdiv.querySelector('.sale');
         if (salebox) {
             saleCSS = true;
             priceboxdiv = salebox;
@@ -12,44 +12,58 @@ function handleSingleItemPage(priceboxdiv) {
 
     if (itemno) {
         lookupCoupon(itemno, function(resp) {
-            var couponTitleText = document.createElement('span');
-            couponTitleText.style['display'] = 'inline-block';
-            couponTitleText.style['vertical-align'] = 'top';
-            couponTitleText.style['color'] = '#3a3a3a';
-            couponTitleText.style['vertical-align'] = 'top';
-            var margin = '5px 5px 0 10px';
-            var fontSize = '1.3em';
-            if (saleCSS) {
-                margin = '-3px 5px 0 5px';
-                fontSize = '0.6em';
+            if (!resp || resp.error) {
+                console.warn('Coupon lookup failed:', resp?.error || 'Unknown error');
+                return;
             }
-            couponTitleText.style['margin'] = margin;
-            couponTitleText.style['font-size'] = fontSize;
+
+            const couponTitleText = document.createElement('span');
+            couponTitleText.style.display = 'inline-block';
+            couponTitleText.style.verticalAlign = 'top';
+            couponTitleText.style.color = '#3a3a3a';
+            
+            const margin = saleCSS ? '-3px 5px 0 5px' : '5px 5px 0 10px';
+            const fontSize = saleCSS ? '0.6em' : '1.3em';
+            
+            couponTitleText.style.margin = margin;
+            couponTitleText.style.fontSize = fontSize;
             couponTitleText.title = 'Provided by hfqpdb.com';
             couponTitleText.innerText = resp.error || '';
+
             if (saleCSS) {
                 priceboxdiv.appendChild(couponTitleText);
             } else {
-                priceboxdiv.insertBefore(couponTitleText, priceboxdiv.querySelector('.comp'));
+                const compElement = priceboxdiv.querySelector('.comp');
+                if (compElement) {
+                    priceboxdiv.insertBefore(couponTitleText, compElement);
+                } else {
+                    priceboxdiv.appendChild(couponTitleText);
+                }
             }
 
             if (resp.hasOwnProperty('bestPrice')) {
-                var couponLinkText = '$' + resp.bestPrice;
-                if (~(resp.bestPrice + '').toLowerCase().indexOf('free')) {
+                let couponLinkText = '$' + resp.bestPrice;
+                if ((resp.bestPrice + '').toLowerCase().includes('free')) {
                     couponLinkText = 'FREE';
                 }
                 couponTitleText.innerText = 'Best Coupon:';
 
-                var couponLink = buildCouponLinkElement(couponLinkText, resp.url);
-                couponLink.style['padding-left'] = '3px';
-                couponLink.style['padding-right'] = '3px';
-                couponLink.style['position'] = 'absolute';
+                const couponLink = buildCouponLinkElement(couponLinkText, resp.url);
+                couponLink.style.paddingLeft = '3px';
+                couponLink.style.paddingRight = '3px';
+                couponLink.style.position = 'absolute';
                 couponLink.innerText = couponLinkText;
+                
                 if (saleCSS) {
                     priceboxdiv.appendChild(couponLink);
                 } else {
-                    couponLink.style['font-size'] = '2.5em';
-                    priceboxdiv.insertBefore(couponLink, priceboxdiv.querySelector('.comp'));
+                    couponLink.style.fontSize = '2.5em';
+                    const compElement = priceboxdiv.querySelector('.comp');
+                    if (compElement) {
+                        priceboxdiv.insertBefore(couponLink, compElement);
+                    } else {
+                        priceboxdiv.appendChild(couponLink);
+                    }
                 }
             }
         });
@@ -57,22 +71,23 @@ function handleSingleItemPage(priceboxdiv) {
 }
 
 function displayCoupons() {
-    var priceboxdivs = document.body.querySelectorAll('.price-box');
+    const priceboxdivs = document.body.querySelectorAll('.price-box');
 
-    if (!priceboxdivs) {
+    if (!priceboxdivs || priceboxdivs.length === 0) {
         return;
     }
 
-    //try single product page
+    // Handle single product page
     if (priceboxdivs.length === 1) {
         handleSingleItemPage(priceboxdivs[0]);
     }
 
-    //continue anyway
+    // Handle multiple products
     priceboxdivs.forEach(function(item) {
-        var itemno = 0;
-        var wishlist = false;
-        if (~window.location.pathname.indexOf('wishlist')) {
+        let itemno = 0;
+        let wishlist = false;
+        
+        if (window.location.pathname.includes('wishlist')) {
             wishlist = true;
             itemno = findWishlistItemNumber(item);
         } else {
@@ -81,30 +96,43 @@ function displayCoupons() {
 
         if (itemno) {
             lookupCoupon(itemno, function(resp) {
-                if (resp.hasOwnProperty('bestPrice')) {
-                    var couponLinkText = '$' + resp.bestPrice;
-                    if (~(resp.bestPrice + '').toLowerCase().indexOf('free')) {
-                        couponLinkText = 'FREE';
-                    }
-                    var couponLink = buildCouponLinkElement(couponLinkText, resp.url);
+                if (!resp || resp.error || !resp.hasOwnProperty('bestPrice')) {
+                    return;
+                }
 
-                    couponLink.style['padding'] = '2px';
-                    couponLink.style['margin-top'] = '5px';
-                    couponLink.style['margin-right'] = '2px';
-                    couponLink.style['font-size'] = '1.3em';
-                    if (!wishlist) {
-                        couponLink.style['float'] = 'right';
-                    }
+                let couponLinkText = '$' + resp.bestPrice;
+                if ((resp.bestPrice + '').toLowerCase().includes('free')) {
+                    couponLinkText = 'FREE';
+                }
+                
+                const couponLink = buildCouponLinkElement(couponLinkText, resp.url);
+                couponLink.style.padding = '2px';
+                couponLink.style.marginTop = '5px';
+                couponLink.style.marginRight = '2px';
+                couponLink.style.fontSize = '1.3em';
+                
+                if (!wishlist) {
+                    couponLink.style.float = 'right';
+                }
 
-                    var insertNode = item.querySelector('.clear');
-                    if (!insertNode) {
-                        insertNode = item.querySelector('.comp');
-                    }
+                let insertNode = item.querySelector('.clear');
+                if (!insertNode) {
+                    insertNode = item.querySelector('.comp');
+                }
+                
+                if (insertNode) {
                     item.insertBefore(couponLink, insertNode);
+                } else {
+                    item.appendChild(couponLink);
                 }
             });
         }
     });
 }
 
-displayCoupons();
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', displayCoupons);
+} else {
+    displayCoupons();
+}

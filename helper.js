@@ -32,30 +32,77 @@ function lookupCoupon(itemno, callback) {
 
 function findSingleItemNo() {
     let itemno = 0;
+    
+    // Method 1: Extract from URL (most reliable)
+    try {
+        const urlMatch = window.location.pathname.match(/(\d+)\.html$/);
+        if (urlMatch && urlMatch[1]) {
+            itemno = urlMatch[1];
+            //console.log('Found item number from URL:', itemno);
+            return itemno;
+        }
+    } catch (ex) {
+        //console.warn('Failed to get product ID from URL:', ex);
+    }
+    
+    // Method 2: Extract from meta keywords
+    try {
+        const metaElement = document.querySelector("meta[name='keywords']");
+        if (metaElement) {
+            const keywords = metaElement.getAttribute("content");
+            const keywordMatch = keywords.match(/(\d+)/);
+            if (keywordMatch && keywordMatch[1]) {
+                itemno = keywordMatch[1];
+                //console.log('Found item number from keywords:', itemno);
+                return itemno;
+            }
+        }
+    } catch (ex) {
+        console.warn('Failed to get product ID from keywords:', ex);
+    }
+    
+    // Method 3: Look for SKU in the page content
+    try {
+        // Look for common SKU patterns in the page
+        const skuSelectors = [
+            '[class*="sku"]',
+            '[class*="SKU"]',
+            '[class*="item"]',
+            '[class*="product"]',
+            '.product-info',
+            '.product-details'
+        ];
+        
+        for (const selector of skuSelectors) {
+            const elements = document.querySelectorAll(selector);
+            for (const element of elements) {
+                const text = element.textContent || element.innerText;
+                const skuMatch = text.match(/(?:SKU|Item|Product|#)\s*:?\s*(\d+)/i);
+                if (skuMatch && skuMatch[1]) {
+                    itemno = skuMatch[1];
+                    console.log('Found item number from page content:', itemno);
+                    return itemno;
+                }
+            }
+        }
+    } catch (ex) {
+        console.warn('Failed to get product ID from page content:', ex);
+    }
+    
+    // Method 4: Fallback to old meta tag method (but log it's not the right one)
     try {
         const metaElement = document.querySelector("meta[property='og:product_id']");
         if (metaElement) {
-            itemno = metaElement.getAttribute("content");
+            const wrongId = metaElement.getAttribute("content");
+            console.warn('Found og:product_id but this is NOT the SKU we need:', wrongId);
+            console.warn('We need the actual item number like 58473, not the internal ID like 22983');
         }
     } catch (ex) {
         console.warn('Failed to get product ID from meta tag:', ex);
     }
     
-    if (!itemno) {
-        try {
-            const titleElement = document.getElementsByClassName("title-infor")[0];
-            if (titleElement) {
-                const matches = titleElement.innerText.matchAll(itemRegex);
-                if (matches) {
-                    itemno = matches[matches.length - 1];
-                }
-            }
-        } catch (ex) {
-            console.warn('Failed to get product ID from title:', ex);
-        }
-    }
-    
-    return itemno;
+    console.error('Could not find valid item number/SKU on this page');
+    return null;
 }
 
 function findListItemNumber(priceboxdiv) {

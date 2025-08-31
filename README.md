@@ -2,8 +2,8 @@
 
 #### Get the extension here:
 
-https://chrome.google.com/webstore/detail/harbor-freight-coupons/hhbonmijejindhnfgcdggfdbklphhloj
+https://chromewebstore.google.com/detail/harbor-freight-coupons-hf/gboebcpneheoakcnpmlondfafigpnmmk
 
 #### Demo:
 
-![demo](https://user-images.githubusercontent.com/8977050/41861220-a0bf61cc-786e-11e8-9284-705c459b5f75.gif)
+![image demo ><](https://lh3.googleusercontent.com/N-2o91EXV-PbLXYZlEdHA65hiT2VG-h8t9uZToZSROeMzQzjp9Z6pNDuGtsLeDTyaf6H3XL3jTqMqTxpvzyQTzZY2g=s800-w800-h500)

@@ -515,10 +515,21 @@ if (document.readyState === 'loading') {
 // Watch for URL changes
 let currentUrl = window.location.href;
 setInterval(() => {
-    if (window.location.href !== currentUrl) {
-        currentUrl = window.location.href;
-        processedSkus.clear();
-        setTimeout(displayCoupons, 1000);
+    const newUrl = window.location.href;
+    if (newUrl !== currentUrl) {
+        // Check if this is just a hash change for the side panel
+        const currentUrlWithoutHash = currentUrl.split('#')[0];
+        const newUrlWithoutHash = newUrl.split('#')[0];
+        
+        // Only process if it's a real page change, not just a side panel hash change
+        if (currentUrlWithoutHash !== newUrlWithoutHash) {
+            currentUrl = newUrl;
+            processedSkus.clear();
+            setTimeout(displayCoupons, 1000);
+        } else {
+            // Update currentUrl to the new URL but don't reprocess coupons
+            currentUrl = newUrl;
+        }
     }
 }, 1000);
 

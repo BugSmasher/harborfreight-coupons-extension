@@ -1,7 +1,7 @@
 {
     "name": "Harbor Freight Coupons - HFQPDB",
     "short_name": "harbor freight coupon database extension",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "manifest_version": 3,
     "description": "Automatically find and display harbor freight coupons on their website from hfqpdb.com",
     "icons": {

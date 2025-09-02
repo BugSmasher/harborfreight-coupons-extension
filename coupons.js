@@ -196,7 +196,7 @@ function addCouponToCartItem(priceElement, itemno) {
     lookupCoupon(itemno, function(resp) {
         if (!resp || resp.error || !resp.hasOwnProperty('bestPrice')) return;
         
-        let couponText = 'HFQPDB - $' + resp.bestPrice;
+        let couponText = 'HFQPDB - $' + resp.bestPrice + '\nexp. ' + new Date(resp.expiration).toLocaleDateString();
         if ((resp.bestPrice + '').toLowerCase().includes('free')) {
             couponText = 'HFQPDB - FREE';
         }
@@ -222,8 +222,8 @@ function addCouponToElement(priceElement, itemno) {
             return;
         }
         
-        // Use consistent coupon text format with HFQPDB prefix
-        let couponText = 'HFQPDB - $' + resp.bestPrice;
+        // Use consistent coupon text format with HFQPDB prefix with date format m/d/y
+        let couponText = 'HFQPDB - $' + resp.bestPrice + '\nexp. ' + new Date(resp.expiration).toLocaleDateString();
         if ((resp.bestPrice + '').toLowerCase().includes('free')) {
             couponText = 'HFQPDB - FREE';
         }

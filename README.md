@@ -21,5 +21,6 @@ The extension automatically detects when you're browsing Harbor Freight's websit
 1. Identifies product SKUs from the page content
 2. Queries the HFQPDB.com database for available coupons
 3. Displays the best available coupon price directly on the page
-4. Provides a clickable link to view the full coupon details
+4. Displays the expiration date of the best coupon
+5. Provides a clickable link to view the full coupon details
 
